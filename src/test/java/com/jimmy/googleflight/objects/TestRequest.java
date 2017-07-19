@@ -13,4 +13,6 @@ public class TestRequest {
 		Request request = new Request("DEN", "SEA", new Date(), 1);
 		System.out.println(request.createRequestJson());
 	}
+	
+	
 }
