@@ -14,7 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class Request {
 	private List<HashMap<String, String>> slice;
 	private Map<String, String> passengers;
-	private String solutions = "30";
+	private String solutions;
 	public List<HashMap<String, String>> getSlice() {
 		return slice;
 	}
@@ -66,19 +66,16 @@ public class Request {
 		passengers.put("adultCount", adultCount+"");
 	}
 	public Request(){}
-	public Request(String origin, String destination, Date date, int adultCount){
+	public Request(String origin, String destination, Date date, int adultCount, String flights){
 		createSlice(origin, destination, date);
 		createPassengers(adultCount);
+		this.solutions=flights;
 	}
 	public String createRequestJson() throws JsonProcessingException{
 		ObjectMapper mapper  = new ObjectMapper();
 		Map<String, Request> request = Collections.singletonMap("request", this);
 		return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(request);
 	}
-	public String createRequest(String origin, String destination, Date date, int adultCount) throws JsonProcessingException{
-		createSlice(origin, destination, date);
-		createPassengers(adultCount);
-		return createRequestJson();
-	}
+	
 	
 }

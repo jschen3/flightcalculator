@@ -15,7 +15,7 @@ import com.jimmy.flightcalculator.googleflight.objects.Response;
 
 public class GoogleFlightClient {
 	static String GOOGLE_FLIGHT_URL = "https://www.googleapis.com/qpxExpress/v1/trips/search?key=";
-	public static String makeRestCall(Request request, String apiKey) throws IOException{
+	public String makeRestCall(Request request, String apiKey) throws IOException{
 		String urlToCall = GOOGLE_FLIGHT_URL+apiKey;
 		URL url = new URL(urlToCall);
 		HttpURLConnection conn = (HttpURLConnection) url.openConnection();

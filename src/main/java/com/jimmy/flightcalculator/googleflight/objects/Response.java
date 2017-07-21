@@ -3,7 +3,9 @@ package com.jimmy.flightcalculator.googleflight.objects;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +13,7 @@ import java.util.Map;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jimmy.flightcalculator.main.FlightCalculator;
 import com.jimmy.flightcalculator.objects.Flight;
 import com.jimmy.flightcalculator.objects.FlightSegment;
 @SuppressWarnings("unchecked")
@@ -30,6 +33,7 @@ public class Response {
 		int count=0;
 		for(Map<String, Object> tripOption:map){
 			Flight flight = new Flight();
+			flight.setRequestTime(FlightCalculator.createDateString(new Date()));
 			String tripOptionPrice=(String) tripOption.get("saleTotal");
 			flight.setPrice(parseTripOptionPrice(tripOptionPrice));
 			List<FlightSegment> segments=parseSlices((List<Map<String, Object>>) tripOption.get("slice"));
@@ -101,4 +105,5 @@ public class Response {
 		}
 		return Float.parseFloat(tripOptionPrice.substring(start));
 	}
+	
 }

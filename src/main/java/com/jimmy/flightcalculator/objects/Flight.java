@@ -1,7 +1,11 @@
 package com.jimmy.flightcalculator.objects;
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
+import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Flight implements Comparable<Flight>{
@@ -40,6 +44,13 @@ public class Flight implements Comparable<Flight>{
 	public String toJson() throws JsonProcessingException{
 		ObjectMapper mapper = new ObjectMapper();
 		return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(this);
+	}
+	public void toFile(String filePath) throws JsonGenerationException, JsonMappingException, IOException{
+		File f = new File(filePath+"/"+getFlightName()+".json");
+		if (!f.exists())
+			f.createNewFile();
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.writerWithDefaultPrettyPrinter().writeValue(f, this);
 	}
 	public String[] toColumns(){
 		String [] columns = new String[6];
