@@ -5,8 +5,8 @@ FlightCalculator is a utility application that pulls the google flights api and 
 ## How to use?
 First fill out the config.properties file with the required information. 
 The api key can be attrieved from [https://developers.google.com/qpx-express/](https://developers.google.com/qpx-express/).
-The password must be the correct for the from password. 
-Also configure the gmail from to allow insecure emails. [https://support.google.com/accounts/answer/6010255?hl=en](https://support.google.com/accounts/answer/6010255?hl=en)
+The password must be the correct password for the from email. 
+Also configure the from gmail to allow insecure emails. [https://support.google.com/accounts/answer/6010255?hl=en](https://support.google.com/accounts/answer/6010255?hl=en)
 ```
 mvn clean install
 ```
