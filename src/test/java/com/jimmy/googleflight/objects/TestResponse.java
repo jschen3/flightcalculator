@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-import com.jimmy.flightcalculator.googleflight.objects.Response;
+import com.jimmy.flightcalculator.client.GoogleFlightParser;
 import com.jimmy.flightcalculator.objects.Flight;
 
 public class TestResponse {
@@ -16,7 +16,7 @@ public class TestResponse {
 	public void testParseResponse() throws IOException{
 		Date date = new Date();
 		File f = new File(resources+"/sampleflightresponse.json");
-		List<Flight> flights=Response.parseResponse(f, "den", "sea", "7-17-2017");
+		List<Flight> flights=GoogleFlightParser.parseResponse(f, "den", "sea", "7-17-2017");
 		System.out.println(flights.size());
 	}
 }

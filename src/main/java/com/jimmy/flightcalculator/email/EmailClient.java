@@ -19,7 +19,6 @@ public class EmailClient {
 	private final String SMTP_PORT = "465";
 	
 	public EmailClient() {
-
 	}
 	
 	public void sendEmail(String to, final String from, final String password, String subject, String bodyText) throws AddressException, MessagingException, UnsupportedEncodingException{
@@ -43,25 +42,20 @@ public class EmailClient {
 
 	private void transportEmail(Session session,String to, String from, String password,  String subject, String bodyText) throws MessagingException, UnsupportedEncodingException {
 		MimeMessage msg = new MimeMessage(session);
-	      //set message headers
-	      msg.addHeader("Content-type", "text/HTML; charset=UTF-8");
-	      msg.addHeader("format", "flowed");
-	      msg.addHeader("Content-Transfer-Encoding", "8bit");
+	    msg.addHeader("Content-type", "text/HTML; charset=UTF-8");
+	    msg.addHeader("format", "flowed");
+	    msg.addHeader("Content-Transfer-Encoding", "8bit");
+	    msg.setFrom(new InternetAddress(from, "NoReply-JD"));
+	    msg.setReplyTo(InternetAddress.parse(to, false));
+	    msg.setSubject(subject, "UTF-8");
+	    msg.setText(bodyText, "UTF-8");
 
-	      msg.setFrom(new InternetAddress(from, "NoReply-JD"));
-
-	      msg.setReplyTo(InternetAddress.parse(to, false));
-
-	      msg.setSubject(subject, "UTF-8");
-
-	      msg.setText(bodyText, "UTF-8");
-
-	      msg.setSentDate(new Date());
-	      msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to, false));
-	      Transport transport = session.getTransport("smtps");
-	      transport.connect(SMTP_HOST, 465, to, password);
-	      transport.sendMessage(msg, msg.getAllRecipients());
-	      transport.close();
+	    msg.setSentDate(new Date());
+	    msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to, false));
+	    Transport transport = session.getTransport("smtps");
+	    transport.connect(SMTP_HOST, Integer.parseInt(SMTP_PORT), to, password);
+	    transport.sendMessage(msg, msg.getAllRecipients());
+	    transport.close();
 	}	
 	
 }

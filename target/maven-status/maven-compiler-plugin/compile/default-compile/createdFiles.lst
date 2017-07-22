@@ -1,0 +1,10 @@
+com/jimmy/flightcalculator/main/FlightCalculator.class
+com/jimmy/flightcalculator/client/GoogleFlightClient.class
+com/jimmy/flightcalculator/email/EmailClient.class
+com/jimmy/flightcalculator/client/GoogleFlightParser.class
+com/jimmy/flightcalculator/objects/Average.class
+com/jimmy/flightcalculator/processor/FlightProcessor.class
+com/jimmy/flightcalculator/email/EmailClient$1.class
+com/jimmy/flightcalculator/objects/FlightSegment.class
+com/jimmy/flightcalculator/client/GoogleFlightRequest.class
+com/jimmy/flightcalculator/objects/Flight.class

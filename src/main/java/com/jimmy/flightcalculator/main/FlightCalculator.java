@@ -15,10 +15,10 @@ import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
 
 import com.jimmy.flightcalculator.client.GoogleFlightClient;
-import com.jimmy.flightcalculator.googleflight.objects.Request;
-import com.jimmy.flightcalculator.googleflight.objects.Response;
+import com.jimmy.flightcalculator.client.GoogleFlightParser;
+import com.jimmy.flightcalculator.client.GoogleFlightRequest;
 import com.jimmy.flightcalculator.objects.Flight;
-import com.jimmy.flightcalculator.writer.FlightProcessor;
+import com.jimmy.flightcalculator.processor.FlightProcessor;
 
 public class FlightCalculator {
 	private final static String CONFIG_FILE = "config.properties";
@@ -67,13 +67,13 @@ public class FlightCalculator {
 	public static List<Flight> callServer(String origin, String destination, String date) throws ParseException, IOException{
 		SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy");
 		Date dateDate=sdf.parse(date);
-		Request request = new Request(origin, destination, dateDate, 1, flights);
+		GoogleFlightRequest request = new GoogleFlightRequest(origin, destination, dateDate, 1, flights);
 		GoogleFlightClient gfg = new GoogleFlightClient();
-		String response=gfg.makeRestCall(request, apiKey);
-		return Response.parseResponse(response, origin, destination, createDateString(requestDate));
+		String response=gfg.callGoogleFlights(request, apiKey);
+		return GoogleFlightParser.parseResponse(response, origin, destination, createDateString(requestDate));
 	}
 	public static void processResults(String origin, String destination, String date, List<Flight> flights) throws IOException, AddressException, MessagingException{
-		FlightProcessor flightProcessor = new FlightProcessor(emailTo, emailFrom, emailPassword, differenceBetweenAverage);
+		FlightProcessor flightProcessor = new FlightProcessor(emailTo, emailFrom, emailPassword, differenceBetweenAverage, flightsForAverage);
 		Collections.sort(flights);
 		flightProcessor.process(origin, destination, date, baseFilePath, flights);	
 	}
