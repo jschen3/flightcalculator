@@ -6,12 +6,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import com.jimmy.flightcalculator.googleflight.objects.Request;
-import com.jimmy.flightcalculator.googleflight.objects.Response;
 
 public class GoogleFlightClient {
 	static String GOOGLE_FLIGHT_URL = "https://www.googleapis.com/qpxExpress/v1/trips/search?key=";

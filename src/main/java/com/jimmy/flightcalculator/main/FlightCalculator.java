@@ -11,11 +11,14 @@ import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.AddressException;
+
 import com.jimmy.flightcalculator.client.GoogleFlightClient;
 import com.jimmy.flightcalculator.googleflight.objects.Request;
 import com.jimmy.flightcalculator.googleflight.objects.Response;
 import com.jimmy.flightcalculator.objects.Flight;
-import com.jimmy.flightcalculator.writer.Writer;
+import com.jimmy.flightcalculator.writer.FlightProcessor;
 
 public class FlightCalculator {
 	private final static String CONFIG_FILE = "config.properties";
@@ -69,13 +72,13 @@ public class FlightCalculator {
 		String response=gfg.makeRestCall(request, apiKey);
 		return Response.parseResponse(response, origin, destination, createDateString(requestDate));
 	}
-	public static void processResults(String origin, String destination, String date, List<Flight> flights) throws IOException{
-		Writer writer = new Writer();
+	public static void processResults(String origin, String destination, String date, List<Flight> flights) throws IOException, AddressException, MessagingException{
+		FlightProcessor flightProcessor = new FlightProcessor(emailTo, emailFrom, emailPassword, differenceBetweenAverage);
 		Collections.sort(flights);
-		writer.write(origin, destination, date, baseFilePath, flights);	
+		flightProcessor.process(origin, destination, date, baseFilePath, flights);	
 	}
 	public static String createDateString(Date date){
-		SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyyy-HH");
+		SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy-HH");
 		return sdf.format(date);
 	}
 }

@@ -4,15 +4,23 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.mail.MessagingException;
+import javax.mail.internet.AddressException;
 
 import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jimmy.flightcalculator.email.EmailClient;
 import com.jimmy.flightcalculator.objects.Average;
 import com.jimmy.flightcalculator.objects.Flight;
 
-public class Writer {
+public class FlightProcessor {
 	private final String CHEAPEST_FLIGHTS_FILE = "cheapest_flights.csv";
 	private final String FLIGHT_INFO_FILE = "flight_info.csv";
 	private final String CHEAPEST_FLIGHT_INFO_FOLDER = "cheapest_flight_info";
@@ -23,7 +31,18 @@ public class Writer {
 	private	File flightInfoFolder;
 	private File cheapFile;
 	private File flightFile;
-	public void write(String origin ,String destination, String flightDate, String baseFilePath, List<Flight> flights) throws IOException{
+	
+	private int difference;
+	private String emailTo;
+	private String emailFrom;
+	private String password;
+	public FlightProcessor(String emailTo, String emailFrom, String password, int difference){
+		this.difference = difference;
+		this.emailTo = emailTo;
+		this.emailFrom = emailFrom;
+		this.password= password;
+	}
+	public void process(String origin ,String destination, String flightDate, String baseFilePath, List<Flight> flights) throws IOException, AddressException, MessagingException{
 		setupFiles(origin, destination, flightDate, baseFilePath);
 		List<Flight> cheapList = new ArrayList<Flight>(flights);
 		cheapList=cheapList.subList(0, 5);
@@ -32,6 +51,18 @@ public class Writer {
 		Average average = new Average();
 		average.calculateNewAverage(cheapList, flightRequestFolderPath);
 		average.writeJson(flightRequestFolderPath);
+		sendEmail(cheapList, average);
+		
+	}
+	private void sendEmail(List<Flight> cheapList, Average average) throws AddressException, UnsupportedEncodingException, JsonProcessingException, MessagingException {
+		float averagePrice = average.getAveragePrice();
+		float cutOff = averagePrice - (float) difference;
+		List<Flight> cheapEnoughFlights=cheapList.stream().filter(flight -> flight.getPrice()<cutOff).collect(Collectors.toList());
+		if (cheapEnoughFlights.size()>1){
+			ObjectMapper mapper  = new ObjectMapper();
+			EmailClient emailClient = new EmailClient();
+			emailClient.sendEmail(emailTo, emailFrom, password, "FlightCalculator Cheapest Flights", mapper.writeValueAsString(cheapEnoughFlights));
+		}
 	}
 	private void writeFlightInfoFiles(List<Flight> flights) throws IOException {
 		for(Flight flight:flights){
