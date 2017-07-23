@@ -21,7 +21,7 @@ import com.jimmy.flightcalculator.objects.Flight;
 import com.jimmy.flightcalculator.processor.FlightProcessor;
 
 public class FlightCalculator {
-	private final static String CONFIG_FILE = "config.properties";
+	private final static String CONFIG_FILE = "/config.properties";
 	private static String apiKey;
 	private static String emailFrom;
 	private static String emailPassword;
@@ -34,11 +34,11 @@ public class FlightCalculator {
 	private static String destination;
 	private static String date;
 	private static Date requestDate;
-	public static void main(String args[]) throws Exception{
-		if (args.length!=3){
+
+	public static void main(String args[]) throws Exception {
+		if (args.length != 3) {
 			throw new Exception("Invalid arguments: Usage [0] origin, [1] destination, [2] flightDate");
-		}
-		else{
+		} else {
 			origin = args[0];
 			destination = args[1];
 			date = args[2];
@@ -47,37 +47,44 @@ public class FlightCalculator {
 			processResults(origin, destination, date, flights);
 		}
 	}
-	public static void initProperties() throws IOException{
-		 InputStream configStream = FlightCalculator.class.getClass().getResourceAsStream(CONFIG_FILE);
-		 if (configStream == null){
-			 configStream = new FileInputStream(new File("src/main/resources/config.properties"));
-		 }
-		 Properties properties = new Properties();
-		 properties.load(configStream);
-		 apiKey = properties.getProperty("apiKey");
-		 emailFrom = properties.getProperty("emailFrom");
-		 emailPassword = properties.getProperty("emailPassword");
-		 emailTo = properties.getProperty("emailTo");
-		 baseFilePath=properties.getProperty("baseFilePath");
-		 flightsForAverage=Integer.parseInt(properties.getProperty("flightsForAverage"));
-		 differenceBetweenAverage=Integer.parseInt(properties.getProperty("differenceBetweenAverage"));
-		 flights = properties.getProperty("flights");
-		 requestDate = new Date();
+
+	private static void initProperties() throws IOException {
+		InputStream configStream = FlightCalculator.class.getClass().getResourceAsStream(CONFIG_FILE);
+		if (configStream == null) {
+			configStream = new FileInputStream(new File("src/main/resources/config.properties"));
+		}
+		Properties properties = new Properties();
+		properties.load(configStream);
+		apiKey = properties.getProperty("apiKey");
+		emailFrom = properties.getProperty("emailFrom");
+		emailPassword = properties.getProperty("emailPassword");
+		emailTo = properties.getProperty("emailTo");
+		baseFilePath = properties.getProperty("baseFilePath");
+		flightsForAverage = Integer.parseInt(properties.getProperty("flightsForAverage"));
+		differenceBetweenAverage = Integer.parseInt(properties.getProperty("differenceBetweenAverage"));
+		flights = properties.getProperty("flights");
+		requestDate = new Date();
 	}
-	public static List<Flight> callServer(String origin, String destination, String date) throws ParseException, IOException{
+
+	private static List<Flight> callServer(String origin, String destination, String date)
+			throws ParseException, IOException {
 		SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy");
-		Date dateDate=sdf.parse(date);
+		Date dateDate = sdf.parse(date);
 		GoogleFlightRequest request = new GoogleFlightRequest(origin, destination, dateDate, 1, flights);
 		GoogleFlightClient gfg = new GoogleFlightClient();
-		String response=gfg.callGoogleFlights(request, apiKey);
+		String response = gfg.callGoogleFlights(request, apiKey);
 		return GoogleFlightParser.parseResponse(response, origin, destination, createDateString(requestDate));
 	}
-	public static void processResults(String origin, String destination, String date, List<Flight> flights) throws IOException, AddressException, MessagingException{
-		FlightProcessor flightProcessor = new FlightProcessor(emailTo, emailFrom, emailPassword, differenceBetweenAverage, flightsForAverage);
+
+	private static void processResults(String origin, String destination, String date, List<Flight> flights)
+			throws IOException, AddressException, MessagingException {
+		FlightProcessor flightProcessor = new FlightProcessor(emailTo, emailFrom, emailPassword,
+				differenceBetweenAverage, flightsForAverage);
 		Collections.sort(flights);
-		flightProcessor.process(origin, destination, date, baseFilePath, flights);	
+		flightProcessor.process(origin, destination, date, baseFilePath, flights);
 	}
-	public static String createDateString(Date date){
+
+	public static String createDateString(Date date) {
 		SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy-HH");
 		return sdf.format(date);
 	}

@@ -16,34 +16,40 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jimmy.flightcalculator.main.FlightCalculator;
 import com.jimmy.flightcalculator.objects.Flight;
 import com.jimmy.flightcalculator.objects.FlightSegment;
+
 @SuppressWarnings("unchecked")
 public class GoogleFlightParser {
-	public static List<Flight> parseResponse(File f, String origin, String destination, String date) throws IOException{
+	public static List<Flight> parseResponse(File f, String origin, String destination, String date)
+			throws IOException {
 		String response = new String(Files.readAllBytes(f.toPath()));
 		return parseResponse(response, origin, destination, date);
 	}
-	public static List<Flight> parseResponse(String response, String origin, String destination, String date) throws JsonParseException, JsonMappingException, IOException{
+
+	public static List<Flight> parseResponse(String response, String origin, String destination, String date)
+			throws JsonParseException, JsonMappingException, IOException {
 		ObjectMapper mapper = new ObjectMapper();
-		Map<String, Object> responseMap=mapper.readValue(response, Map.class);
-		List<Map<String, Object>> tripOption = (List<Map<String, Object>>) ((Map<String,Object>) responseMap.get("trips")).get("tripOption");
+		Map<String, Object> responseMap = mapper.readValue(response, Map.class);
+		List<Map<String, Object>> tripOption = (List<Map<String, Object>>) ((Map<String, Object>) responseMap
+				.get("trips")).get("tripOption");
 		return parseTripOptions(tripOption, origin, destination, date);
 	}
-	static List<Flight> parseTripOptions(List<Map<String, Object>> map, String origin, String destination, String date){
+
+	private static List<Flight> parseTripOptions(List<Map<String, Object>> map, String origin, String destination,
+			String date) {
 		List<Flight> flights = new ArrayList<Flight>();
-		int count=0;
-		for(Map<String, Object> tripOption:map){
+		int count = 0;
+		for (Map<String, Object> tripOption : map) {
 			Flight flight = new Flight();
 			flight.setRequestTime(FlightCalculator.createDateString(new Date()));
-			String tripOptionPrice=(String) tripOption.get("saleTotal");
+			String tripOptionPrice = (String) tripOption.get("saleTotal");
 			flight.setPrice(parseTripOptionPrice(tripOptionPrice));
-			List<FlightSegment> segments=parseSlices((List<Map<String, Object>>) tripOption.get("slice"));
-			if (segments!=null){
-				flight.setFlightName(origin+"_to_"+destination + "_"+ date + "_flight_"+count);
+			List<FlightSegment> segments = parseSlices((List<Map<String, Object>>) tripOption.get("slice"));
+			if (segments != null) {
+				flight.setFlightName(origin + "_to_" + destination + "_" + date + "_flight_" + count);
 				flight.setFlightSegments(segments);
 				flights.add(flight);
 				count++;
-			}
-			else{
+			} else {
 				continue;
 			}
 		}
@@ -52,19 +58,18 @@ public class GoogleFlightParser {
 
 	private static List<FlightSegment> parseSlices(List<Map<String, Object>> slices) {
 		List<FlightSegment> flightSegments = new ArrayList<FlightSegment>();
-		for(Map<String, Object> slice: slices){
-			List<Map<String, Object>> segments =  (List<Map<String, Object>>) slice.get("segment");
-			for(Map<String, Object> segment:segments){
+		for (Map<String, Object> slice : slices) {
+			List<Map<String, Object>> segments = (List<Map<String, Object>>) slice.get("segment");
+			for (Map<String, Object> segment : segments) {
 				int duration = (Integer) segment.get("duration");
-				String carrier = (String) ((Map<String,Object>) segment.get("flight")).get("carrier");
-				String flightNumber = (String) ((Map<String,Object>) segment.get("flight")).get("number");
+				String carrier = (String) ((Map<String, Object>) segment.get("flight")).get("carrier");
+				String flightNumber = (String) ((Map<String, Object>) segment.get("flight")).get("number");
 				String bookingCode = (String) segment.get("bookingCode");
 				List<Map<String, Object>> legs = (List<Map<String, Object>>) segment.get("leg");
 				Map<String, String> leg = parseLegs(legs);
-				if (leg==null){
+				if (leg == null) {
 					return null;
-				}
-				else{
+				} else {
 					String aircraft = leg.get("aircraft");
 					String arrivalTime = leg.get("arrivalTime");
 					String departureTime = leg.get("departureTime");
@@ -80,7 +85,7 @@ public class GoogleFlightParser {
 	}
 
 	private static Map<String, String> parseLegs(List<Map<String, Object>> legs) {
-		//TODO: deal with multiple legs
+		// TODO: deal with multiple legs
 		Map<String, String> leg = new HashMap<String, String>();
 		if (legs.size() > 1) {
 			return null;
@@ -93,17 +98,18 @@ public class GoogleFlightParser {
 		}
 		return leg;
 	}
-	private static float parseTripOptionPrice(String tripOptionPrice){
-		int start=0;
-		int zero = (int)'0';
-		int nine = (int)'9';
+
+	private static float parseTripOptionPrice(String tripOptionPrice) {
+		int start = 0;
+		int zero = (int) '0';
+		int nine = (int) '9';
 		int tripCharInt = (int) tripOptionPrice.charAt(start);
-		while(tripCharInt<zero || tripCharInt>nine){
+		while (tripCharInt < zero || tripCharInt > nine) {
 			start++;
 			tripCharInt = (int) tripOptionPrice.charAt(start);
-			
+
 		}
 		return Float.parseFloat(tripOptionPrice.substring(start));
 	}
-	
+
 }

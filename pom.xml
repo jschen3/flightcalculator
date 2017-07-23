@@ -68,6 +68,7 @@
 		</pluginRepository>
 	</pluginRepositories>
 	<build>
+	
 		<finalName>flightcalculator</finalName>
 			<plugins>
 				<plugin>

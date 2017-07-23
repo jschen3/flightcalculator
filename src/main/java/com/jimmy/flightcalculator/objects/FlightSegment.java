@@ -92,6 +92,6 @@ public class FlightSegment {
 		this.arrivalTime = arrivalTime;
 		this.origin = origin;
 		this.destination = destination;
-		this.aircraft=aircraft;
+		this.aircraft = aircraft;
 	}
 }
